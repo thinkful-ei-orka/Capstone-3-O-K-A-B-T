@@ -1,5 +1,4 @@
 BEGIN;
-
     TRUNCATE
         users,
         curses,
