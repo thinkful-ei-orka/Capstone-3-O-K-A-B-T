@@ -1,7 +1,7 @@
 {
-  "name": "bestiary-server",
+  "name": "curseBless",
   "version": "1.0.0",
-  "description": "Server for a DND 5e bestiary application",
+  "description": "Server for a therapeutic cursing application",
   "private": true,
   "main": "src/server.js",
   "scripts": {
