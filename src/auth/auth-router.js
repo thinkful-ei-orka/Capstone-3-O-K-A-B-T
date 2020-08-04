@@ -23,10 +23,11 @@ authRouter
         loginUser.username
       );
 
-      if (!dbUser){
+      if (!dbUser) {
         return res.status(400).json({
           error: 'Incorrect username or password',
-        });}
+        });
+      }
 
       const compareMatch = await AuthService.comparePasswords(
         loginUser.password,
@@ -49,17 +50,39 @@ authRouter
     } catch (error) {
       next(error);
     }
-  })
-
-  .put(requireAuth, (req, res) => {
-    const sub = req.user.username;
-    const payload = {
-      user_id: req.user.id,
-      name: req.user.name,
-    };
-    res.send({
-      authToken: AuthService.createJwt(sub, payload),
-    });
   });
 
+//used to refresh tokens, I don't believe we need this
+// .put(requireAuth, (req, res) => {
+//   const sub = req.user.username;
+//   const payload = {
+//     user_id: req.user.id,
+//     name: req.user.name,
+//   };
+//   res.send({
+//     authToken: AuthService.createJwt(sub, payload),
+//   });
+// });
+
 module.exports = authRouter;
+
+
+/*
+Front end if needed for put:
+
+refreshToken() {
+    return fetch(`${config.API_ENDPOINT}/auth/token`, {
+      method: 'PUT',
+      headers: {
+        'authorization': `Bearer ${TokenService.getAuthToken()}`,
+      },
+    })
+      .then(res =>
+        (!res.ok)
+          ? res.json().then(e => Promise.reject(e))
+          : res.json()
+      )
+  },
+)};
+
+*/
