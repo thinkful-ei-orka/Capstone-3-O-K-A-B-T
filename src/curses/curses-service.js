@@ -26,6 +26,15 @@ const CursesService = {
         blessing: blessingId
       })
       .where('curse_id', curseId);
+  },
+
+  resetUserLimit(db,user_id){
+    return db
+      .from('users')
+      .update({
+        limiter:3
+      })
+      .where('user_id',user_id)
   }
 };
 

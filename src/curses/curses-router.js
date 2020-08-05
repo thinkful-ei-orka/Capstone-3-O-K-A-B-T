@@ -31,17 +31,22 @@ cursesRouter
       next(error);
     }
   })
+//Need to verify that the provided curse hasn't been blessed yet
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
       const now = new Date;
-      //1000 = 1 second, 86400 = 1 day (in seconds)
-      if (req.user.limiter < 1 && ((now - req.user.lastblessing) < 86400000)) {
-        return res.status(403).json('Too many blessings');
+//1000 = 1 second, 86400 = 1 day (in seconds)
+//limiter is depeleted and last blessing was within 24 hours
+      if (req.user.limiter === 0 && ((now - req.user.lastblessing) < 86400000)) {
+        return res.status(403).json(`You're out of blessings`);
       } else {
+//limiter is less than max, but last blessing is over 24 hours ago
+        if (req.user.limiter < 3 && ((now - req.user.lastblessing) > 86400000)) {
+          await CursesService.resetUserLimit(req.app.get('db'), req.user.user_id);
+        }
         await CursesService.blessCurse(req.app.get('db'), req.body.curse_id, req.body.blessing_id, req.user, now);
 
-        console.log('end');
-        return res.status(202).json({ mesage: `Curse blessed with blessing ${req.body.blessing_id}!` });
+        return res.status(202).json(`Curse blessed with blessing ${req.body.blessing_id}!`);
       }
     } catch (error) {
       next(error);
