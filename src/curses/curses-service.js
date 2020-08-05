@@ -10,9 +10,9 @@ const CursesService = {
     return db
       .from('users')
       .update({
-        totalblessings: user.totalblessings+1,
+        totalblessings: user.totalblessings + 1,
         lastblessing: time,
-        limiter: user.limiter-1
+        limiter: user.limiter - 1
       })
       .where('user_id', user.user_id);
   },
@@ -28,13 +28,38 @@ const CursesService = {
       .where('curse_id', curseId);
   },
 
-  resetUserLimit(db,user_id){
+  resetUserLimit(db, user_id) {
     return db
       .from('users')
       .update({
-        limiter:3
+        limiter: 3
       })
-      .where('user_id',user_id)
+      .where('user_id', user_id);
+  },
+
+  getAllCurses(db, user_id) {
+    return db
+      .from('curses')
+      .select('*')
+      .whereNot("user_id", user_id)
+      .where("pulled_by", null);
+  },
+
+  getCurseById(db, curse_id) {
+    return db
+      .from('curses')
+      .select('*')
+      .where('curse_id', curse_id);
+  },
+
+  updateCursePulled(db, curse_id, user_id) {
+    return db
+      .from('curses')
+      .update({
+        pulled_by: user_id,
+        pulled_time: new Date()
+      })
+      .where("curse_id", curse_id);
   }
 };
 
