@@ -14,13 +14,17 @@ cursesRouter
         req.app.get('db'),
         req.user.user_id
       );
+      if (!curse_id[0]) {
+        return res.status('200').json('No available curses');
+      } else {
+        const index = Math.floor(Math.random() * curse_id.length);
 
-      const index = Math.floor(Math.random() * curse_id.length);
 
-      const curse = { curse_id: curse_id[index].curse_id, curse: curse_id[index].curse };
-      await CursesService.updateCursePulled(req.app.get('db'), curse.curse_id, req.user.user_id);
-      return res.status(200).json(curse);
 
+        const curse = { curse_id: curse_id[index].curse_id, curse: curse_id[index].curse };
+        await CursesService.updateCursePulled(req.app.get('db'), curse.curse_id, req.user.user_id);
+        return res.status(200).json(curse);
+      }
     } catch (error) {
       next(error);
     }
