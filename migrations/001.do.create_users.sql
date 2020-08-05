@@ -4,6 +4,6 @@ CREATE TABLE users (
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
   totalBlessings INTEGER DEFAULT 0,
-  lastBlessing TIMESTAMPTZ NOT NULL default now(),
+  lastBlessing TIMESTAMPTZ NOT NULL DEFAULT now(),
   limiter INTEGER DEFAULT 3
 );

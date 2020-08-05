@@ -52,8 +52,25 @@ userRouter
     }
   })
   .get(requireAuth, jsonBodyParser, async (req, res, next) => {
-    const { name, username, totalblessings, lastblessing, limiter } = req.user;
-    return res.status(200).json({ name, username, totalblessings, lastblessing, limiter });
+    const { user_id, name, username, totalblessings, lastblessing, limiter } = req.user;
+
+    const blessedCurses = await UserService.blessedCurses(req.app.get('db'), user_id);
+
+    //default blessing (currently set to 1)
+    blessedCurses.forEach(curse => curse.blessing === null ? curse.blessing = 1 : null);
+
+    blessedCurses.forEach(async (curse) => {
+      await UserService.deleteBlessedCurse(req.app.get('db'), curse.curse_id);
+    });
+
+    blessedCurses.forEach(curse =>
+      delete curse.curse_id
+    );
+
+    return res.status(200).json({
+      user: { name, username, totalblessings, lastblessing, limiter },
+      blessedCurses: blessedCurses
+    });
   });
 
 module.exports = userRouter;

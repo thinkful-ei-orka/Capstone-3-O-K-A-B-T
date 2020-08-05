@@ -30,10 +30,12 @@ VALUES
     ('U+1F91F');
 
 INSERT INTO curses
-    (curse, user_refid, blessed, blessing)
+    (curse, user_id, blessed, blessing, pulled_by, pulled_time)
 VALUES
-    ('Too much stress', 1, false, null);
-
+    ('Too much stress', 1, false, null, null, null),
+    ('Crazy people be crazy', 2, false, null, 1, TO_TIMESTAMP('2020-08-05 15:54:47.98000','YYYY-MM-DD HH24:MI:SS.US')),
+    ('This is the last one', 1, true, 1, 2, TO_TIMESTAMP('2020-08-05 15:54:47.98000','YYYY-MM-DD HH24:MI:SS.US'));
+-- '2020-08-05T15:54:47.980Z'
 INSERT INTO quotes
     (quote_text,quote_source)
 VALUES

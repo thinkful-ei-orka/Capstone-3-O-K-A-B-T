@@ -1,7 +1,7 @@
 const CursesService = {
-  postCurse(db, curse, user_refid = null) {
+  postCurse(db, curse, user_id = null) {
     return db
-      .insert({ curse, user_refid })
+      .insert({ curse, user_id })
       .into('curses')
       .returning('*')
       .then(([curse]) => curse);

@@ -40,6 +40,20 @@ const UserService = {
       name: user.name,
       username: user.username,
     };
+  },
+
+  blessedCurses(db, user_id) {
+    return db
+      .select('curse_id', 'curse', 'blessing')
+      .from('curses')
+      .whereRaw("(user_id = ? and blessed = TRUE) or pulled_time < now() - interval '1 hour'", [user_id]);
+  },
+
+  deleteBlessedCurse(db, curse_id) {
+    return db
+      .from('curses')
+      .where('curse_id', curse_id)
+      .del();
   }
 };
 
