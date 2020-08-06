@@ -54,6 +54,7 @@ cursesRouter
     }
   })
   //Need to verify that the provided curse hasn't been blessed yet
+  //No longer needed, the curse/get filters available curses first
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
       const now = new Date;
