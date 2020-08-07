@@ -6,5 +6,5 @@ CREATE TABLE curses (
   blessed BOOLEAN NOT NULL DEFAULT false,
   blessing INTEGER REFERENCES blessings(blessing_id) ON DELETE CASCADE,
   pulled_by INTEGER REFERENCES users(user_id) ON DELETE CASCADE DEFAULT NULL,
-  pulled_time TIMESTAMPTZ DEFAULT NULL
+  pulled_time TIMESTAMPTZ DEFAULT now()
 );

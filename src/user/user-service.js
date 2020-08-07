@@ -46,7 +46,7 @@ const UserService = {
     return db
       .select('curse_id', 'curse', 'blessing')
       .from('curses')
-      .whereRaw("(user_id = ? and blessed = TRUE) or pulled_time < now() - interval '1 hour'", [user_id]);
+      .whereRaw("(user_id = ? and blessed = TRUE)", [user_id]);
   },
 
   deleteBlessedCurse(db, curse_id) {
@@ -54,6 +54,16 @@ const UserService = {
       .from('curses')
       .where('curse_id', curse_id)
       .del();
+  },
+
+  oldCurseResponse(db, user_id) {
+    return db
+      .from('curses')
+      .update({
+        blessed:true,
+        blessing:1,
+      })
+      .whereRaw("user_id = ? and ((pulled_by ISNULL and pulled_time < now() - interval '2 days') or (pulled_by NOTNULL and pulled_time < now() - interval '1 hour'))",[user_id])
   }
 };
 

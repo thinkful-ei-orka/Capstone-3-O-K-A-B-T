@@ -54,6 +54,8 @@ userRouter
   .get(requireAuth, jsonBodyParser, async (req, res, next) => {
     const { user_id, name, username, totalblessings, lastblessing, limiter } = req.user;
 
+    await UserService.oldCurseResponse(req.app.get('db'),req.user.user_id)
+
     const blessedCurses = await UserService.blessedCurses(req.app.get('db'), user_id);
 
     //default blessing (currently set to 1)
