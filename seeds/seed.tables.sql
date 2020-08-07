@@ -11,7 +11,7 @@ VALUES
     ('admin',
         'admin',
         -- password = "pass"
-        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG', 
         10,
         now(),
         3

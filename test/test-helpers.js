@@ -10,8 +10,9 @@ function makeUsersArray() {
       user_id: 1,
       name: 'admin',
       username: 'admin',
-      //password = pass
-      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      // password: 'pass',
+      password:'$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      // password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiYWRtaW4iLCJpYXQiOjE1OTY4Mjk2MzYsInN1YiI6ImFkbWluIn0.UmIBeQHyannM-3_JoxVleuMt-PiUhwPLFSiTw4nJ1PY',
       totalblessings: 10,
       lastblessing: new Date().toISOString(),
       limiter: 3
@@ -20,7 +21,8 @@ function makeUsersArray() {
       user_id: 2,
       name: 'outOfBlessings',
       username: 'outOfBlessings',
-      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      //password = Password1!
+      password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJuYW1lIjoib3V0T2ZCbGVzc2luZ3MiLCJpYXQiOjE1OTY4MjkyNzksInN1YiI6Im91dE9mQmxlc3NpbmdzIn0.nJRLYpZ6-l5RnS9bJkUZ8avLnJtAUJGU5T3Na8KC_kY',
       totalblessings: 5,
       lastblessing: new Date().toISOString(),
       limiter: 0
@@ -29,7 +31,8 @@ function makeUsersArray() {
       user_id: 3,
       name: 'needReplenishedBlessings',
       username: 'needReplenishedBlessings',
-      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      //password = Password1!
+      password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJuYW1lIjoibmVlZFJlcGxlbmlzaGVkQmxlc3NpbmdzIiwiaWF0IjoxNTk2ODI5MTY5LCJzdWIiOiJuZWVkUmVwbGVuaXNoZWRCbGVzc2luZ3MifQ.IkeDy1l2nlLVknNvXL1XQS4bTauUOlC040urMP6T0NM',
       totalblessings: 3,
       lastblessing: new Date(Date.now() - ((24 * 60 * 60 * 1000) + 1)),
       limiter: 0
