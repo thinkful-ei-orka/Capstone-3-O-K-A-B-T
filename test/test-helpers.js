@@ -1,6 +1,8 @@
 /* eslint-disable quotes */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const knex = require('knex');
+
 
 function makeUsersArray() {
   return [
@@ -10,8 +12,8 @@ function makeUsersArray() {
       username: 'admin',
       //password = pass
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
-      totalBlessings: 10,
-      lastBlessing: new Date().toISOString(),
+      totalblessings: 10,
+      lastblessing: new Date().toISOString(),
       limiter: 3
     },
     {
@@ -19,8 +21,8 @@ function makeUsersArray() {
       name: 'outOfBlessings',
       username: 'outOfBlessings',
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
-      totalBlessings: 5,
-      lastBlessing: new Date().toISOString(),
+      totalblessings: 5,
+      lastblessing: new Date().toISOString(),
       limiter: 0
     },
     {
@@ -28,8 +30,8 @@ function makeUsersArray() {
       name: 'needReplenishedBlessings',
       username: 'needReplenishedBlessings',
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
-      totalBlessings: 3,
-      lastBlessing: new Date(Date.now() - ((24 * 60 * 60 * 1000) + 1)),
+      totalblessings: 3,
+      lastblessing: new Date(Date.now() - ((24 * 60 * 60 * 1000) + 1)),
       limiter: 0
     }
   ];
@@ -184,7 +186,7 @@ function cleanTables(db) {
       users,
       quotes,
       blessings,
-      curses,
+      curses
       RESTART IDENTITY CASCADE`
   );
 }
@@ -234,7 +236,7 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     subject: user.username,
     algorithm: 'HS256'
   });
-  return `Bearer ${token}`;
+  return `${token}`;
 }
 
 function makeFixtures() {
@@ -245,7 +247,15 @@ function makeFixtures() {
   return { testUsers, testQuotes, testBlessings, testCurses };
 }
 
+function makeKnexInstance() {
+  return knex({
+    client: 'pg',
+    connection: process.env.TEST_DATABASE_URL,
+  });
+}
+
 module.exports = {
+  makeKnexInstance,
   makeUsersArray,
   makeQuotesArray,
   makeBlessingsArray,
