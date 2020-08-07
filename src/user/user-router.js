@@ -61,16 +61,6 @@ userRouter
     //default blessing (currently set to 1)
     blessedCurses.forEach(curse => curse.blessing === null ? curse.blessing = 1 : null);
 
-//Auto-delete blessed/old curses
-    // blessedCurses.forEach(async (curse) => {
-    //   await UserService.deleteBlessedCurse(req.app.get('db'), curse.curse_id);
-    // });
-
-//May need to send the curse_id to the front end
-    // blessedCurses.forEach(curse =>
-    //   delete curse.curse_id
-    // );
-
     return res.status(200).json({
       user: { name, username, totalblessings, lastblessing, limiter },
       blessedCurses: blessedCurses
