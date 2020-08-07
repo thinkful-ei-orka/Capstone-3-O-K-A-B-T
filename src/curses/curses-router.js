@@ -74,6 +74,25 @@ cursesRouter
     } catch (error) {
       next(error);
     }
+  })
+
+  .delete(jsonBodyParser, requireAuth, async (req, res, next) => {
+    try {
+      if (!req.body.curse_id) { return 'body does not contain curse_id for deletion'; }
+      const deletedCurse = await CursesService.getCurseById(req.app.get('db'), req.body.curse_id);
+
+      const isCurseOwner = deletedCurse.user_id === req.user.user_id;
+
+      if (isCurseOwner) {
+        await CursesService.deleteBlessedCurse(req.app.get('db'), req.body.curse_id);
+        return res.status(200).json({ deletedCurse: deletedCurse });
+      } else {
+        return res.status(403).json('User is not the owner of provided curse');
+      }
+
+    } catch (error) {
+      next(error);
+    }
   });
 
 module.exports = cursesRouter;

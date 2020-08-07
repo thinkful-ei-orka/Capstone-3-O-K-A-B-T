@@ -49,13 +49,6 @@ const UserService = {
       .whereRaw("(user_id = ? and blessed = TRUE)", [user_id]);
   },
 
-  deleteBlessedCurse(db, curse_id) {
-    return db
-      .from('curses')
-      .where('curse_id', curse_id)
-      .del();
-  },
-
   oldCurseResponse(db, user_id) {
     return db
       .from('curses')

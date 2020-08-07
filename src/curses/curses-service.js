@@ -49,7 +49,8 @@ const CursesService = {
     return db
       .from('curses')
       .select('*')
-      .where('curse_id', curse_id);
+      .where('curse_id', curse_id)
+      .first();
   },
 
   updateCursePulled(db, curse_id, user_id) {
@@ -60,6 +61,12 @@ const CursesService = {
         pulled_time: new Date()
       })
       .where("curse_id", curse_id);
+  },
+  deleteBlessedCurse(db, curse_id) {
+    return db
+      .from('curses')
+      .where('curse_id', curse_id)
+      .del();
   }
 };
 
