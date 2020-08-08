@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const knex = require('knex');
 
@@ -21,7 +21,7 @@ function makeUsersArray() {
       name: 'outOfBlessings',
       username: 'outOfBlessings',
       //password = Password1!
-      password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJuYW1lIjoib3V0T2ZCbGVzc2luZ3MiLCJpYXQiOjE1OTY4MjkyNzksInN1YiI6Im91dE9mQmxlc3NpbmdzIn0.nJRLYpZ6-l5RnS9bJkUZ8avLnJtAUJGU5T3Na8KC_kY',
+      password:'$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 5,
       lastblessing: new Date(),
       limiter: 0
@@ -31,7 +31,7 @@ function makeUsersArray() {
       name: 'needReplenishedBlessings',
       username: 'needReplenishedBlessings',
       //password = Password1!
-      password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJuYW1lIjoibmVlZFJlcGxlbmlzaGVkQmxlc3NpbmdzIiwiaWF0IjoxNTk2ODI5MTY5LCJzdWIiOiJuZWVkUmVwbGVuaXNoZWRCbGVzc2luZ3MifQ.IkeDy1l2nlLVknNvXL1XQS4bTauUOlC040urMP6T0NM',
+      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 3,
       lastblessing: new Date(Date.now() - ((24 * 60 * 60 * 1000) + 1)),
       limiter: 0
@@ -210,7 +210,7 @@ function cleanTables(db) {
           trx.raw(`ALTER SEQUENCE blessings_blessing_id_seq minvalue 0 START WITH 1`),
           trx.raw(`ALTER SEQUENCE curses_curse_id_seq minvalue 0 START WITH 1`),
           trx.raw(`SELECT setval('user_user_id_seq',0)`),
-          trx.raw(`SELECT setval('quotes_qoute_id_seq',0)`),
+          trx.raw(`SELECT setval('quotes_quote_id_seq',0)`),
           trx.raw(`SELECT setval('blessings_blessing_id_seq',0)`),
           trx.raw(`SELECT setval('curses_curse_id_seq',0)`),
         ])
@@ -239,7 +239,7 @@ function seedUsers(db, users) {
 }
 
 function seedQuotes(db, quotes) {
-  return db.into('qoutes').insert(quotes)
+  return db.into('quotes').insert(quotes)
     .then(() =>
       db.raw(
         `SELECT setval('quotes_quote_id_seq',?)`,

@@ -4,7 +4,7 @@ const app = require('../src/app');
 const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 
 
 describe('Auth Endpoints', function () {
