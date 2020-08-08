@@ -144,7 +144,7 @@ function makeCursesArray() {
       pulled_time: new Date(Date.now() - (1000 * 60))
     },
     {
-      curse_id: 3,
+      curse_id: 4,
       curse: 'pulled not blessed, timed out',
       user_id: 1,
       blessed: false,
@@ -153,7 +153,7 @@ function makeCursesArray() {
       pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1))
     },
     {
-      curse_id: 3,
+      curse_id: 5,
       curse: 'pulled blessed, not timed out',
       user_id: 1,
       blessed: true,
@@ -162,7 +162,7 @@ function makeCursesArray() {
       pulled_time: new Date(Date.now() - (1000 * 60))
     },
     {
-      curse_id: 3,
+      curse_id: 6,
       curse: 'pulled blessed, timed out',
       user_id: 1,
       blessed: true,
@@ -171,7 +171,7 @@ function makeCursesArray() {
       pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1))
     },
     {
-      curse_id: 3,
+      curse_id: 7,
       curse: 'not pulled, timed out (2-days)',
       user_id: 1,
       blessed: false,

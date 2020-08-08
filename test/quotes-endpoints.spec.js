@@ -4,7 +4,7 @@ const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
 
-describe('Blessings Endpoints', function () {
+describe('Quotes Endpoints', function () {
   let db;
   const { testQuotes } = helpers.makeFixtures();
 
