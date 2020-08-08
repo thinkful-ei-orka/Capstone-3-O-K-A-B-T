@@ -10,11 +10,10 @@ function makeUsersArray() {
       user_id: 1,
       name: 'admin',
       username: 'admin',
-      // password: 'pass',
+      // password = 'pass',
       password:'$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
-      // password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiYWRtaW4iLCJpYXQiOjE1OTY4Mjk2MzYsInN1YiI6ImFkbWluIn0.UmIBeQHyannM-3_JoxVleuMt-PiUhwPLFSiTw4nJ1PY',
       totalblessings: 10,
-      lastblessing: new Date().toISOString(),
+      lastblessing: new Date(),
       limiter: 3
     },
     {
@@ -24,7 +23,7 @@ function makeUsersArray() {
       //password = Password1!
       password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJuYW1lIjoib3V0T2ZCbGVzc2luZ3MiLCJpYXQiOjE1OTY4MjkyNzksInN1YiI6Im91dE9mQmxlc3NpbmdzIn0.nJRLYpZ6-l5RnS9bJkUZ8avLnJtAUJGU5T3Na8KC_kY',
       totalblessings: 5,
-      lastblessing: new Date().toISOString(),
+      lastblessing: new Date(),
       limiter: 0
     },
     {
@@ -194,6 +193,31 @@ function cleanTables(db) {
   );
 }
 
+/*
+function cleanTables(db) {
+  return db.transaction(trx =>
+    trx.raw(
+      `TRUNCATE
+      users,
+      quotes,
+      blessings,
+      curses`
+    )
+      .then(() =>
+        Promise.all([
+          trx.raw(`ALTER SEQUENCE users_user_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`ALTER SEQUENCE quotes_quote_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`ALTER SEQUENCE blessings_blessing_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`ALTER SEQUENCE curses_curse_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`SELECT setval('user_user_id_seq',0)`),
+          trx.raw(`SELECT setval('quotes_qoute_id_seq',0)`),
+          trx.raw(`SELECT setval('blessings_blessing_id_seq',0)`),
+          trx.raw(`SELECT setval('curses_curse_id_seq',0)`),
+        ])
+      )
+  );
+}
+*/
 function seedBlessings(db, blessings) {
   return db.into('blessings').insert(blessings)
     .then(() =>

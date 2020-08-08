@@ -1,5 +1,5 @@
 process.env.TZ = 'UTC';
-process.env.NODE_ENV = 'test';
+process.env.NODE_ENV = 'development';
 process.env.JWT_SECRET = 'my-jwt-secret';
 
 require('dotenv').config();

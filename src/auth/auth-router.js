@@ -22,7 +22,6 @@ authRouter
         req.app.get('db'),
         loginUser.username
       );
-
       if (!dbUser) {
         return res.status(400).json({
           error: 'Incorrect username or password',
