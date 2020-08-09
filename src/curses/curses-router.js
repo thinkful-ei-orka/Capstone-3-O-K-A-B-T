@@ -32,19 +32,25 @@ cursesRouter
   })
   .post(userFromAuth, jsonBodyParser, async (req, res, next) => {
     try {
-      if(req.body.curse===""){
-        return res.status(400).json('Cannot send an empty curse')
+      if (req.body.curse === "") {
+        return res.status(400).json('Cannot send an empty curse');
       }
-      if(req.body.curse.length<10){
-        return res.status(400).json('Must be longer than 10 characters')
+      if (!req.body.curse) {
+        return res.status(400).json(`'curse' field is required in body`);
       }
-      if(req.body.curse.split(' ').length<4){
-        return res.status(400).json('Must be longer than 3 words')
+      if (req.body.curse.length < 10) {
+        return res.status(400).json('Must be longer than 10 characters');
+      }
+      if (req.body.curse.split(' ').length < 4) {
+        return res.status(400).json('Must be longer than 3 words');
+      }
+      if (req.body.curse.length > 400) {
+        return res.status(400).json('Must be less than 400 characters');
       }
       if (req.user.user_id !== null) {
         await CursesService.postCurse(req.app.get('db'), req.body.curse, req.user.user_id);
 
-        return res.status(200).json({
+        return res.status(201).json({
           message: `Curse sent as '${req.user.username}'`,
           curse: req.body.curse,
           user: req.user.username
@@ -52,7 +58,7 @@ cursesRouter
       } else {
         await CursesService.postCurse(req.app.get('db'), req.body.curse);
 
-        return res.status(200).json({
+        return res.status(201).json({
           message: 'Curse sent annonymously',
           curse: req.body.curse,
           user: null
@@ -62,8 +68,7 @@ cursesRouter
       next(error);
     }
   })
-  //Need to verify that the provided curse hasn't been blessed yet
-  //No longer needed, the curse/get filters available curses first
+
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
       const now = new Date;

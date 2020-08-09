@@ -4,7 +4,7 @@ const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
 
-describe('Curses Endpoints', function () {
+describe.only('Curses Endpoints', function () {
   let db;
   const { testCurses, testUsers, testBlessings } = helpers.makeFixtures();
 
@@ -20,11 +20,12 @@ describe('Curses Endpoints', function () {
   before('cleanup', () => helpers.cleanTables(db));
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe.skip('GET /api/curses/', () => {
+  describe('GET /api/curses/', () => {
     context('no available curses for blessing', () => {
       beforeEach('insert users', () => {
         helpers.seedUsers(db, testUsers);
       });
+      after('cleanup', () => helpers.cleanTables(db));
       it(`responds with 200 and "No available curses"`, () => {
         return supertest(app)
           .get('/api/curses/')
@@ -46,7 +47,7 @@ describe('Curses Endpoints', function () {
     context('curses available for blessing', () => {
       let pulledCurse;
       let editedCurse;
-      before('seed curses/users', () => {
+      before('seed blessings/users/curses', () => {
         helpers.seedBlessings(db, testBlessings);
         helpers.seedUsers(db, testUsers);
         helpers.seedCurses(db, testCurses);
@@ -65,15 +66,82 @@ describe('Curses Endpoints', function () {
           });
       });
 
-      it('updates the curse in the database with the user_id and time of pull', async () => {
+      it('updates the curse in the database with the user_id and time of pull', () => {
         expect(editedCurse.pulled_by).to.eql(testUsers[1].user_id);
         expect(Date.now() - new Date(editedCurse.pulled_time) < 10000);
       });
     });
   });
 
-  describe('POST /api/curses/', () => {
+  describe.only('POST /api/curses/', () => {
+    context('user is anonymous', () => {
+      it(`responds with 201 and 'Curse sent annonymously' and user:null`, () => {
+        return supertest(app)
+          .post('/api/curses/')
+          .send({ curse: 'Testing for a valid curse' })
+          .expect(201, { message: 'Curse sent annonymously', curse: 'Testing for a valid curse', user: null });
+      });
+    });
 
+    context('user is signed in', () => {
+      before('seed users', () => {
+        helpers.seedUsers(db, testUsers);
+      });
+      context('no curse field in body', () => {
+        it(`responds with 400 and "'curse' field is required in body"`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send()
+            .expect(400, `"'curse' field is required in body"`);
+        });
+      });
+      context('input is empty', () => {
+        it(`responds with 400 and 'Cannot send an empty curse'`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse: "" })
+            .expect(400, '"Cannot send an empty curse"');
+        });
+      });
+      context('input is less than 15 characters', () => {
+        it(`responds with 400 and 'Must be longer than 10 characters'`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse: "Test" })
+            .expect(400, '"Must be longer than 10 characters"');
+        });
+      });
+      context('input is less than 3 words', () => {
+        it(`responds with 400 and 'Must be longer than 3 words'`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse: "Test curse" })
+            .expect(400, '"Must be longer than 3 words"');
+        });
+      });
+      context('input is more than 400 characters', () => {
+        it(`responds with 400 and 'Must be less than 400 characters'`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse: "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678 9 0 1" })
+            .expect(400, '"Must be less than 400 characters"');
+        });
+      });
+      context('input is valid', () => {
+        it(`responds with 201, the curse, the username, and a message "Curse sent as 'username'"`, () => {
+          return supertest(app)
+            .post('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse: "Testing string for a valid curse" })
+            .expect(201, { curse: 'Testing string for a valid curse', user: testUsers[0].username, message: `Curse sent as '${testUsers[0].username}'` });
+        });
+      });
+    });
   });
   describe.skip('PATCH /api/curses/', () => {
 
