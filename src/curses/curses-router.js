@@ -32,6 +32,15 @@ cursesRouter
   })
   .post(userFromAuth, jsonBodyParser, async (req, res, next) => {
     try {
+      if(req.body.curse===""){
+        return res.status(400).json('Cannot send an empty curse')
+      }
+      if(req.body.curse.length<10){
+        return res.status(400).json('Must be longer than 10 characters')
+      }
+      if(req.body.curse.split(' ').length<4){
+        return res.status(400).json('Must be longer than 3 words')
+      }
       if (req.user.user_id !== null) {
         await CursesService.postCurse(req.app.get('db'), req.body.curse, req.user.user_id);
 

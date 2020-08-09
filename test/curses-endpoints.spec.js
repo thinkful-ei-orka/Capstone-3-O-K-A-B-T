@@ -20,7 +20,7 @@ describe('Curses Endpoints', function () {
   before('cleanup', () => helpers.cleanTables(db));
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('GET /api/curses/', () => {
+  describe.skip('GET /api/curses/', () => {
     context('no available curses for blessing', () => {
       beforeEach('insert users', () => {
         helpers.seedUsers(db, testUsers);
@@ -70,5 +70,15 @@ describe('Curses Endpoints', function () {
         expect(Date.now() - new Date(editedCurse.pulled_time) < 10000);
       });
     });
+  });
+
+  describe('POST /api/curses/', () => {
+
+  });
+  describe.skip('PATCH /api/curses/', () => {
+
+  });
+  describe.skip('DELETE /api/curses/', () => {
+
   });
 });
