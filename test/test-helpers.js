@@ -11,7 +11,7 @@ function makeUsersArray() {
       name: 'admin',
       username: 'admin',
       // password = 'pass',
-      password:'$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 10,
       lastblessing: new Date(),
       limiter: 3
@@ -21,7 +21,7 @@ function makeUsersArray() {
       name: 'outOfBlessings',
       username: 'outOfBlessings',
       //password = Password1!
-      password:'$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+      password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 5,
       lastblessing: new Date(),
       limiter: 0
@@ -258,6 +258,14 @@ function seedCurses(db, curses) {
     );
 }
 
+function getCurseById(db, curse_id) {
+  return db.select('*').from('curses').where('curse_id', curse_id).first();
+}
+
+function getAllCurses(db) {
+  return db.select().from('curses');
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
     subject: user.username,
@@ -288,6 +296,8 @@ module.exports = {
   makeBlessingsArray,
   makeCursesArray,
   makeFixtures,
+  getCurseById,
+  getAllCurses,
 
   cleanTables,
   seedUsers,
