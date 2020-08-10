@@ -73,7 +73,7 @@ describe.only('Curses Endpoints', function () {
     });
   });
 
-  describe.only('POST /api/curses/', () => {
+  describe('POST /api/curses/', () => {
     context('user is anonymous', () => {
       it(`responds with 201 and 'Curse sent annonymously' and user:null`, () => {
         return supertest(app)
@@ -84,7 +84,7 @@ describe.only('Curses Endpoints', function () {
     });
 
     context('user is signed in', () => {
-      before('seed users', () => {
+      beforeEach('seed users', () => {
         helpers.seedUsers(db, testUsers);
       });
       context('no curse field in body', () => {
@@ -143,10 +143,125 @@ describe.only('Curses Endpoints', function () {
       });
     });
   });
-  describe.skip('PATCH /api/curses/', () => {
+
+  describe('PATCH /api/curses/', () => {
+    beforeEach('seed users, blessings, curses', () => {
+      helpers.seedUsers(db, testUsers);
+      helpers.seedBlessings(db, testBlessings);
+      helpers.seedCurses(db, testCurses);
+    });
+    afterEach('clean tables', () => {
+      helpers.cleanTables(db);
+    });
+    context('user is not logged in', () => {
+      it('returns 401 not Authorized', () => {
+        return supertest(app)
+          .patch('/api/curses/')
+          .expect(401)
+          .expect({ error: 'Missing bearer token' });
+      });
+    });
+    context('user is logged in', () => {
+      const sendObject = { blessing_id: 1, curse_id: 1 };
+      context('user is out of blessings', () => {
+        context('user is not permitted to replenish blessings', () => {
+          it(`returns 403 and "You're out of blessings"`, () => {
+            return supertest(app)
+              .patch('/api/curses/')
+              .send(sendObject)
+              .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[1])}`)
+              .expect(403)
+              .expect(`"You're out of blessings"`);
+          });
+        });
+        context('user is permitted to replenish blessings', () => {
+          it('allows the blessing to occur, but resets the blessings beforehand', () => {
+            return supertest(app)
+              .patch('/api/curses/')
+              .send(sendObject)
+              .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[2])}`)
+              .expect(202)
+              .expect(`"Curse blessed with blessing ${1}!"`)
+              .then(async () => {
+                const user = await helpers.getUserById(db, 3);
+                return expect(user.limiter).to.eql(2);
+              });
+          });
+        });
+      });
+      context('user has blessings available', () => {
+        context('req body does not contain the appropriate fields', () => {
+          const requiredFields = ['blessing_id', 'curse_id'];
+          requiredFields.forEach(field => {
+            let sendObject = { blessing_id: 1, curse_id: 1 };
+            delete sendObject[field];
+            it(`responds with 'Missing ${field} in body`, () => {
+              return supertest(app)
+                .patch('/api/curses/')
+                .send(sendObject)
+                .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+                .expect(400)
+                .expect(`"Missing ${field} in body"`);
+            });
+          });
+        });
+        context('user sends a valid requiest', () => {
+          const sendObject = { blessing_id: 1, curse_id: 1 };
+          it("Updates the curse with the desired information and returns 202: 'Curse blessed with blessing {blessing_id}'", () => {
+            return supertest(app)
+              .patch('/api/curses/')
+              .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+              .send(sendObject)
+              .expect(202)
+              .expect('"Curse blessed with blessing 1!"')
+              .then(async () => {
+                const curse = await helpers.getCurseById(db, 1);
+                expect(curse.blessed).to.eql(true);
+                expect(curse.blessing).to.eql(1);
+              });
+          });
+        });
+      });
+    });
 
   });
-  describe.skip('DELETE /api/curses/', () => {
 
+  describe.only('DELETE /api/curses/', () => {
+    before('seed blessings', () => {
+      helpers.seedBlessings(db, testBlessings);
+    });
+    beforeEach('seed users', () => {
+      helpers.seedUsers(db, testUsers);
+    });
+    afterEach('clean tables', () => {
+      helpers.cleanTables(db);
+    });
+    context('body does not contain curse_id', () => {
+      it('responds with 400 and "body does not contain curse_id for deletion', () => {
+        return supertest(app)
+          .delete('/api/curses/')
+          .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+          .expect(400)
+          .expect('"body does not contain curse_id for deletion"');
+      });
+    });
+    context('body contains curse_id', () => {
+      // beforeEach('seed users, blessings, curses', () => {
+      //   helpers.seedCurses(db, testCurses);
+      // });
+      context('user is not the curse originator', () => {
+        it('responds with 403: "User is not the owner of provided curse"', () => {
+          return supertest(app)
+            .delete('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[1])}`)
+            .send({ curse_id: 1 })
+            .expect(403)
+            .expect('"User is not the owner of provided curse"');
+        });
+      });
+      // context('user is curse originator', () => {
+
+      // });
+    });
   });
 });

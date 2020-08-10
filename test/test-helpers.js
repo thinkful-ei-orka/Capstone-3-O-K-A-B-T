@@ -266,6 +266,10 @@ function getAllCurses(db) {
   return db.select().from('curses');
 }
 
+function getUserById(db, user_id) {
+  return db.select().from('users').where('user_id', user_id).first();
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
     subject: user.username,
@@ -298,6 +302,7 @@ module.exports = {
   makeFixtures,
   getCurseById,
   getAllCurses,
+  getUserById,
 
   cleanTables,
   seedUsers,

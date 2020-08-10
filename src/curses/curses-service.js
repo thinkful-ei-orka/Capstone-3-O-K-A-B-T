@@ -67,6 +67,13 @@ const CursesService = {
       .from('curses')
       .where('curse_id', curse_id)
       .del();
+  },
+  getUserById(db, user_id) {
+    return db
+      .select()
+      .from('users')
+      .where('user_id', user_id)
+      .first();
   }
 };
 

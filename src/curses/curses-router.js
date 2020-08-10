@@ -71,15 +71,23 @@ cursesRouter
 
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
+      if (!req.body.blessing_id) {
+        return res.status(400).json('Missing blessing_id in body');
+      }
+      if (!req.body.curse_id) {
+        return res.status(400).json('Missing curse_id in body');
+      }
       const now = new Date;
       //1000 = 1 second, 86400 = 1 day (in seconds)
-      //limiter is depeleted and last blessing was within 24 hours
-      if (req.user.limiter === 0 && ((now - req.user.lastblessing) < 86400000)) {
+      //limiter is depeleted and last blessing was within 3 hours
+      if (req.user.limiter === 0 && ((now - req.user.lastblessing) < 10800000)) {
         return res.status(403).json(`You're out of blessings`);
       } else {
-        //limiter is less than max, but last blessing is over 24 hours ago
-        if (req.user.limiter < 3 && ((now - req.user.lastblessing) > 86400000)) {
+        //limiter is less than max, but last blessing is over 3 hours ago
+        if (req.user.limiter < 3 && ((now - req.user.lastblessing) > 10800000)) {
           await CursesService.resetUserLimit(req.app.get('db'), req.user.user_id);
+          const person = await CursesService.getUserById(req.app.get('db'), req.user.user_id);
+          req.user = person;
         }
         await CursesService.blessCurse(req.app.get('db'), req.body.curse_id, req.body.blessing_id, req.user, now);
 
@@ -92,11 +100,13 @@ cursesRouter
 
   .delete(jsonBodyParser, requireAuth, async (req, res, next) => {
     try {
-      if (!req.body.curse_id) { return 'body does not contain curse_id for deletion'; }
+      if (!req.body.curse_id) { return res.status(400).json('body does not contain curse_id for deletion'); }
+
       const deletedCurse = await CursesService.getCurseById(req.app.get('db'), req.body.curse_id);
 
+      console.log(deletedCurse);
       const isCurseOwner = deletedCurse.user_id === req.user.user_id;
-
+      console.log(isCurseOwner);
       if (isCurseOwner) {
         await CursesService.deleteBlessedCurse(req.app.get('db'), req.body.curse_id);
         return res.status(200).json({ deletedCurse: deletedCurse });
