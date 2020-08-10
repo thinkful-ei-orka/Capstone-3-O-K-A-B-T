@@ -4,9 +4,10 @@ const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
 const bcrypt = require('bcryptjs');
+const { getBlessedCurses } = require('./test-helpers');
 
 
-describe('User Endpoints', function () {
+describe.only('User Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -17,17 +18,17 @@ describe('User Endpoints', function () {
     app.set('db', db);
   });
 
-  after('disconnect from db', () => db.destroy());
+  after('disconnect from db', async () => await db.destroy());
 
-  before('cleanup', () => helpers.cleanTables(db));
+  before('cleanup', async () => await helpers.cleanTables(db));
 
-  afterEach('cleanup', () => helpers.cleanTables(db));
+  afterEach('cleanup', async () => await helpers.cleanTables(db));
 
   /**
    * @description Register a user and populate their fields
    **/
   describe(`POST /api/user`, () => {
-    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
 
     const requiredFields = ['username', 'password', 'name'];
 
@@ -134,11 +135,9 @@ describe('User Endpoints', function () {
           .send(newUser)
           .expect(201)
           .expect(res => {
-            expect(res.body).to.have.property('id');
             expect(res.body.username).to.eql(newUser.username);
             expect(res.body.name).to.eql(newUser.name);
             expect(res.body).to.not.have.property('password');
-            expect(res.headers.location).to.eql(`/api/user/${res.body.id}`);
           });
       });
 
@@ -168,41 +167,33 @@ describe('User Endpoints', function () {
               })
           );
       });
-      // describe(`GET /api/user`, () => {
-      //   beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-      //   it.only(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, () => {
-      //     // const userReq = {
-      //     //   user_id: ,
-      //     //   name: ,
-      //     //   username: ,
-      //     //   totalblessings: ,
-      //     //   lastblessing: ,
-      //     //   limiter: ,
-      //     // }
-      //     return supertest(app)
-      //       .get('/api/user')
-      //       .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
-      //       .expect(200)
-      //       .expect();
-      //   }
 
-      //   // .get(requireAuth, jsonBodyParser, async (req, res, next) => {
-      //   const { user_id, name, username, totalblessings, lastblessing, limiter } = req.user;
 
-      //   await UserService.oldCurseResponse(req.app.get('db'),req.user.user_id)
+      describe(`GET /api/user`, () => {
+        beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
+        it.only(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, async () => {
 
-      //   const blessedCurses = await UserService.blessedCurses(req.app.get('db'), user_id);
+          const user = await getUserById(db, 1)
 
-      //   //default blessing (currently set to 1)
-      //   blessedCurses.forEach(curse => curse.blessing === null ? curse.blessing = 1 : null);
+          const blessing = await getBlessedCurses(db, 1)
 
-      //   return res.status(200).json({
-      //     user: { name, username, totalblessings, lastblessing, limiter },
-      //     blessedCurses: blessedCurses
-      //   });
-      // });
+          //get call to test user db to grab info and await 
 
+          return supertest(app)
+            .get('/api/user')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .expect(200)
+            .expect(res => {
+              expect(res.body.user.username).to.eql(user.username);
+              expect(res.body.user.name).to.eql(user.name);
+              expect(res.body.user.totalblessings).to.eql(user.totalBlessings);
+              expect(res.body.user.lastblessing).to.eql(user.lastBlessing.toISOString())
+              expect(res.body.user.limiter).to.eql(user.limiter)
+              expect(res.body.blessedCurses).to.eql(blessing)
+            })
+
+        });
+      });
     });
-  });
-});
-
+  })
+})

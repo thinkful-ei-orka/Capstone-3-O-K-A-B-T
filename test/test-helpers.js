@@ -293,6 +293,13 @@ function makeKnexInstance() {
   });
 }
 
+function getBlessedCurses(db, user_id) {
+  return db
+    .select('curse_id', 'curse', 'blessing')
+    .from('curses')
+    .whereRaw("(user_id = ? and blessed = TRUE)", [user_id]);
+}
+
 module.exports = {
   makeKnexInstance,
   makeUsersArray,
@@ -310,4 +317,5 @@ module.exports = {
   seedQuotes,
   seedCurses,
   makeAuthHeader,
+  getBlessedCurses
 };
