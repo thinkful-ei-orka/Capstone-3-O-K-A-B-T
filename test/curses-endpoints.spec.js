@@ -16,14 +16,14 @@ describe('Curses Endpoints', function () {
     app.set('db', db);
   });
 
-  after('disconnect from db', () => db.destroy());
-  before('cleanup', () => helpers.cleanTables(db));
-  afterEach('cleanup', () => helpers.cleanTables(db));
+  after('disconnect from db', async () => await db.destroy());
+  before('cleanup', async () => await helpers.cleanTables(db));
+  afterEach('cleanup', async () => await helpers.cleanTables(db));
 
   describe('GET /api/curses/', () => {
     context('no available curses for blessing', () => {
-      beforeEach('insert users', () => {
-        helpers.seedUsers(db, testUsers);
+      beforeEach('insert users', async () => {
+        await helpers.seedUsers(db, testUsers);
       });
       it(`responds with 200 and "No available curses"`, () => {
         return supertest(app)
@@ -46,27 +46,27 @@ describe('Curses Endpoints', function () {
     context('curses available for blessing', () => {
       let pulledCurse;
       let editedCurse;
-      beforeEach('seed blessings/users/curses', () => {
-        helpers.seedBlessings(db, testBlessings);
-        helpers.seedUsers(db, testUsers);
-        helpers.seedCurses(db, testCurses);
+      beforeEach('seed blessings/users/curses', async () => {
+        await helpers.seedBlessings(db, testBlessings);
+        await helpers.seedUsers(db, testUsers);
+        await helpers.seedCurses(db, testCurses);
       });
       it('responds with 200 and the curse information for blessing', () => {
-        this.retries(2);
         return supertest(app)
           .get('/api/curses/')
           .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[1])}`)
           .expect(200)
-          .expect(async res => {
+          .expect(res => {
             pulledCurse = res.body.curse_id;
             expect(res.body).to.have.property('curse_id');
             expect(res.body).to.have.property('curse');
-            editedCurse = await helpers.getCurseById(db, res.body.curse_id);
+          })
+          .then(async () => {
+            editedCurse = await helpers.getCurseById(db, pulledCurse);
           });
       });
 
       it('updates the curse in the database with the user_id and time of pull', () => {
-        this.retries(2);
         expect(editedCurse.pulled_by).to.eql(testUsers[1].user_id);
         expect(Date.now() - new Date(editedCurse.pulled_time) < 10000);
       });
@@ -84,8 +84,8 @@ describe('Curses Endpoints', function () {
     });
 
     context('user is signed in', () => {
-      beforeEach('seed users', () => {
-        helpers.seedUsers(db, testUsers);
+      beforeEach('seed users', async () => {
+        await helpers.seedUsers(db, testUsers);
       });
       context('no curse field in body', () => {
         it(`responds with 400 and "'curse' field is required in body"`, () => {
@@ -145,10 +145,10 @@ describe('Curses Endpoints', function () {
   });
 
   describe('PATCH /api/curses/', () => {
-    beforeEach('seed users, blessings, curses', () => {
-      helpers.seedUsers(db, testUsers);
-      helpers.seedBlessings(db, testBlessings);
-      helpers.seedCurses(db, testCurses);
+    beforeEach('seed users, blessings, curses', async () => {
+      await helpers.seedUsers(db, testUsers);
+      await helpers.seedBlessings(db, testBlessings);
+      await helpers.seedCurses(db, testCurses);
     });
     context('user is not logged in', () => {
       it('returns 401 not Authorized', () => {
@@ -225,6 +225,9 @@ describe('Curses Endpoints', function () {
 
   describe('DELETE /api/curses/', () => {
     context('body does not contain curse_id', () => {
+      before('seed user', async () => {
+        await helpers.seedUsers(db, testUsers);
+      });
       it('responds with 400 and "body does not contain curse_id for deletion', () => {
         return supertest(app)
           .delete('/api/curses/')
@@ -235,10 +238,10 @@ describe('Curses Endpoints', function () {
     });
     context('body contains curse_id', () => {
       context('user is not the curse originator', () => {
-        beforeEach('seed users, blessings, curses', () => {
-          helpers.seedUsers(db, testUsers);
-          helpers.seedBlessings(db, testBlessings);
-          helpers.seedCurses(db, testCurses);
+        beforeEach('seed users, blessings, curses', async () => {
+          await helpers.seedUsers(db, testUsers);
+          await helpers.seedBlessings(db, testBlessings);
+          await helpers.seedCurses(db, testCurses);
         });
         it('responds with 403: "User is not the owner of provided curse"', () => {
           return supertest(app)
@@ -250,10 +253,10 @@ describe('Curses Endpoints', function () {
         });
       });
       context('user is curse originator', () => {
-        beforeEach('seed users, blessings, curses', () => {
-          helpers.seedUsers(db, testUsers);
-          helpers.seedBlessings(db, testBlessings);
-          helpers.seedCurses(db, testCurses);
+        beforeEach('seed users, blessings, curses', async () => {
+          await helpers.seedUsers(db, testUsers);
+          await helpers.seedBlessings(db, testBlessings);
+          await helpers.seedCurses(db, testCurses);
         });
         it('responds with 200 and the deleted curse', async () => {
           const deletedCurse = await helpers.getCurseById(db, 4);
