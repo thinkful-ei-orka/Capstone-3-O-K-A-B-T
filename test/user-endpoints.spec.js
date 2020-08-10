@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const { getBlessedCurses } = require('./test-helpers');
 
 
-describe.only('User Endpoints', function () {
+describe('User Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -146,15 +146,16 @@ describe.only('User Endpoints', function () {
           username: 'test username',
           password: '11AAaa!!',
           name: 'test name',
+          
         };
         return supertest(app)
           .post('/api/user')
           .send(newUser)
-          .expect(res =>
-            db
-              .from('user')
+          .expect(res => {
+            return db
+              .from('users')
               .select('*')
-              .where({ id: res.body.id })
+              .where( 'username', res.body.username )
               .first()
               .then(row => {
                 expect(row.username).to.eql(newUser.username);
@@ -164,36 +165,38 @@ describe.only('User Endpoints', function () {
               })
               .then(compareMatch => {
                 expect(compareMatch).to.be.true;
-              })
+              })}
           );
       });
+    })
+  });
 
+  describe(`GET /api/user`, () => {
+    beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
+    it(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, async () => {
 
-      describe(`GET /api/user`, () => {
-        beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
-        it.only(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, async () => {
+      const user = await helpers.getUserById(db, 1)
 
-          const user = await getUserById(db, 1)
+      const blessing = await helpers.getBlessedCurses(db, 1)
 
-          const blessing = await getBlessedCurses(db, 1)
+      //get call to test user db to grab info and await 
+      
+      
+      return supertest(app)
+        .get('/api/user')
+        .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.user.username).to.eql(user.username);
+          expect(res.body.user.name).to.eql(user.name);
+          expect(res.body.user.totalblessings).to.eql(user.totalblessings);
+          expect(res.body.user.lastblessing).to.eql(user.lastblessing.toISOString())
+          expect(res.body.user.limiter).to.eql(user.limiter)
+          expect(res.body.blessedCurses).to.eql(blessing)
+        })
 
-          //get call to test user db to grab info and await 
-
-          return supertest(app)
-            .get('/api/user')
-            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
-            .expect(200)
-            .expect(res => {
-              expect(res.body.user.username).to.eql(user.username);
-              expect(res.body.user.name).to.eql(user.name);
-              expect(res.body.user.totalblessings).to.eql(user.totalBlessings);
-              expect(res.body.user.lastblessing).to.eql(user.lastBlessing.toISOString())
-              expect(res.body.user.limiter).to.eql(user.limiter)
-              expect(res.body.blessedCurses).to.eql(blessing)
-            })
-
-        });
-      });
     });
-  })
+  });
+
 })
+
