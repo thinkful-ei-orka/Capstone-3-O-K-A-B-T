@@ -123,7 +123,7 @@ function makeCursesArray() {
       blessed: false,
       blessing: null,
       pulled_by: null,
-      pulled_time: new Date()
+      pulled_time: new Date().toISOString()
     },
     {
       curse_id: 2,
@@ -132,7 +132,7 @@ function makeCursesArray() {
       blessed: false,
       blessing: null,
       pulled_by: null,
-      pulled_time: new Date()
+      pulled_time: new Date().toISOString()
     },
     {
       curse_id: 3,
@@ -141,7 +141,7 @@ function makeCursesArray() {
       blessed: false,
       blessing: null,
       pulled_by: 2,
-      pulled_time: new Date(Date.now() - (1000 * 60))
+      pulled_time: new Date(Date.now() - (1000 * 60)).toISOString()
     },
     {
       curse_id: 4,
@@ -150,7 +150,7 @@ function makeCursesArray() {
       blessed: false,
       blessing: null,
       pulled_by: 2,
-      pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1))
+      pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1)).toISOString()
     },
     {
       curse_id: 5,
@@ -159,7 +159,7 @@ function makeCursesArray() {
       blessed: true,
       blessing: 1,
       pulled_by: 2,
-      pulled_time: new Date(Date.now() - (1000 * 60))
+      pulled_time: new Date(Date.now() - (1000 * 60)).toISOString()
     },
     {
       curse_id: 6,
@@ -168,7 +168,7 @@ function makeCursesArray() {
       blessed: true,
       blessing: 1,
       pulled_by: 2,
-      pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1))
+      pulled_time: new Date(Date.now() - ((1000 * 60 * 60) + 1)).toISOString()
     },
     {
       curse_id: 7,
@@ -177,7 +177,7 @@ function makeCursesArray() {
       blessed: false,
       blessing: null,
       pulled_by: null,
-      pulled_time: new Date(Date.now() - ((1000 * 60 * 60 * 24 * 2) + 1))
+      pulled_time: new Date(Date.now() - ((1000 * 60 * 60 * 24 * 2) + 1)).toISOString()
     }
   ];
 }

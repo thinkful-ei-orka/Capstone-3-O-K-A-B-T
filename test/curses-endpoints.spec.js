@@ -25,7 +25,6 @@ describe('Curses Endpoints', function () {
       beforeEach('insert users', () => {
         helpers.seedUsers(db, testUsers);
       });
-      after('cleanup', () => helpers.cleanTables(db));
       it(`responds with 200 and "No available curses"`, () => {
         return supertest(app)
           .get('/api/curses/')
@@ -47,7 +46,7 @@ describe('Curses Endpoints', function () {
     context('curses available for blessing', () => {
       let pulledCurse;
       let editedCurse;
-      before('seed blessings/users/curses', () => {
+      beforeEach('seed blessings/users/curses', () => {
         helpers.seedBlessings(db, testBlessings);
         helpers.seedUsers(db, testUsers);
         helpers.seedCurses(db, testCurses);
@@ -67,6 +66,7 @@ describe('Curses Endpoints', function () {
       });
 
       it('updates the curse in the database with the user_id and time of pull', () => {
+        this.retries(2);
         expect(editedCurse.pulled_by).to.eql(testUsers[1].user_id);
         expect(Date.now() - new Date(editedCurse.pulled_time) < 10000);
       });
@@ -150,9 +150,6 @@ describe('Curses Endpoints', function () {
       helpers.seedBlessings(db, testBlessings);
       helpers.seedCurses(db, testCurses);
     });
-    afterEach('clean tables', () => {
-      helpers.cleanTables(db);
-    });
     context('user is not logged in', () => {
       it('returns 401 not Authorized', () => {
         return supertest(app)
@@ -227,9 +224,6 @@ describe('Curses Endpoints', function () {
   });
 
   describe('DELETE /api/curses/', () => {
-    before('seed users', () => {
-      helpers.seedUsers(db, testUsers);
-    });
     context('body does not contain curse_id', () => {
       it('responds with 400 and "body does not contain curse_id for deletion', () => {
         return supertest(app)
@@ -240,12 +234,12 @@ describe('Curses Endpoints', function () {
       });
     });
     context('body contains curse_id', () => {
-      beforeEach('seed users', () => {
-        helpers.seedUsers(db, testUsers);
-        helpers.seedBlessings(db, testBlessings);
-        helpers.seedCurses(db, testCurses);
-      });
       context('user is not the curse originator', () => {
+        beforeEach('seed users, blessings, curses', () => {
+          helpers.seedUsers(db, testUsers);
+          helpers.seedBlessings(db, testBlessings);
+          helpers.seedCurses(db, testCurses);
+        });
         it('responds with 403: "User is not the owner of provided curse"', () => {
           return supertest(app)
             .delete('/api/curses/')
@@ -256,14 +250,30 @@ describe('Curses Endpoints', function () {
         });
       });
       context('user is curse originator', () => {
+        beforeEach('seed users, blessings, curses', () => {
+          helpers.seedUsers(db, testUsers);
+          helpers.seedBlessings(db, testBlessings);
+          helpers.seedCurses(db, testCurses);
+        });
         it('responds with 200 and the deleted curse', async () => {
           const deletedCurse = await helpers.getCurseById(db, 4);
+          const { curse_id, curse, user_id, blessed, blessing, pulled_by, pulled_time } = deletedCurse;
           return supertest(app)
             .delete('/api/curses/')
             .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
             .send({ curse_id: 4 })
             .expect(200)
-            .expect({ deletedCurse: deletedCurse });
+            .expect({
+              deletedCurse: {
+                curse_id: curse_id,
+                curse: curse,
+                user_id: user_id,
+                blessed: blessed,
+                blessing: blessing,
+                pulled_by: pulled_by,
+                pulled_time: pulled_time.toISOString()
+              }
+            });
         });
       });
     });
