@@ -103,10 +103,16 @@ cursesRouter
       if (!req.body.curse_id) { return res.status(400).json('body does not contain curse_id for deletion'); }
 
       const deletedCurse = await CursesService.getCurseById(req.app.get('db'), req.body.curse_id);
-
-      console.log(deletedCurse);
+      const curses = await CursesService.getAllCurses(req.app.get('db'),2);
+      console.log(curses);
       const isCurseOwner = deletedCurse.user_id === req.user.user_id;
-      console.log(isCurseOwner);
+      // let isCurseOwner
+      // if (deletedCurse !== undefined) {
+      //   isCurseOwner = deletedCurse.user_id === req.user.user_id;
+      // } else {
+      //   isCurseOwner = false;
+      // }
+
       if (isCurseOwner) {
         await CursesService.deleteBlessedCurse(req.app.get('db'), req.body.curse_id);
         return res.status(200).json({ deletedCurse: deletedCurse });

@@ -4,7 +4,7 @@ const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
 
-describe.only('Curses Endpoints', function () {
+describe('Curses Endpoints', function () {
   let db;
   const { testCurses, testUsers, testBlessings } = helpers.makeFixtures();
 
@@ -226,15 +226,9 @@ describe.only('Curses Endpoints', function () {
 
   });
 
-  describe.only('DELETE /api/curses/', () => {
-    before('seed blessings', () => {
-      helpers.seedBlessings(db, testBlessings);
-    });
-    beforeEach('seed users', () => {
+  describe('DELETE /api/curses/', () => {
+    before('seed users', () => {
       helpers.seedUsers(db, testUsers);
-    });
-    afterEach('clean tables', () => {
-      helpers.cleanTables(db);
     });
     context('body does not contain curse_id', () => {
       it('responds with 400 and "body does not contain curse_id for deletion', () => {
@@ -246,22 +240,32 @@ describe.only('Curses Endpoints', function () {
       });
     });
     context('body contains curse_id', () => {
-      // beforeEach('seed users, blessings, curses', () => {
-      //   helpers.seedCurses(db, testCurses);
-      // });
+      beforeEach('seed users', () => {
+        helpers.seedUsers(db, testUsers);
+        helpers.seedBlessings(db, testBlessings);
+        helpers.seedCurses(db, testCurses);
+      });
       context('user is not the curse originator', () => {
         it('responds with 403: "User is not the owner of provided curse"', () => {
           return supertest(app)
             .delete('/api/curses/')
-            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[1])}`)
-            .send({ curse_id: 1 })
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse_id: 2 })
             .expect(403)
             .expect('"User is not the owner of provided curse"');
         });
       });
-      // context('user is curse originator', () => {
-
-      // });
+      context('user is curse originator', () => {
+        it('responds with 200 and the deleted curse', async () => {
+          const deletedCurse = await helpers.getCurseById(db, 4);
+          return supertest(app)
+            .delete('/api/curses/')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ curse_id: 4 })
+            .expect(200)
+            .expect({ deletedCurse: deletedCurse });
+        });
+      });
     });
   });
 });

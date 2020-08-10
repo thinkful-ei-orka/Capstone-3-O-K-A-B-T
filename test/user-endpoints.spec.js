@@ -168,41 +168,41 @@ describe('User Endpoints', function () {
               })
           );
       });
-      describe(`GET /api/user`, () => {
-        beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-         it.only (`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, () => {
-          const userReq = {
-            user_id: ,
-            name: ,
-            username: ,
-            totalblessings: ,
-            lastblessing: ,
-            limiter: ,
-          }
-          return supertest(app)
-          .get('/api/user')
-          .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
-          .expect(200)
-          .expect()
-         }
+      // describe(`GET /api/user`, () => {
+      //   beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+      //   it.only(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, () => {
+      //     // const userReq = {
+      //     //   user_id: ,
+      //     //   name: ,
+      //     //   username: ,
+      //     //   totalblessings: ,
+      //     //   lastblessing: ,
+      //     //   limiter: ,
+      //     // }
+      //     return supertest(app)
+      //       .get('/api/user')
+      //       .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+      //       .expect(200)
+      //       .expect();
+      //   }
 
-      // .get(requireAuth, jsonBodyParser, async (req, res, next) => {
+      //   // .get(requireAuth, jsonBodyParser, async (req, res, next) => {
       //   const { user_id, name, username, totalblessings, lastblessing, limiter } = req.user;
-    
+
       //   await UserService.oldCurseResponse(req.app.get('db'),req.user.user_id)
-    
+
       //   const blessedCurses = await UserService.blessedCurses(req.app.get('db'), user_id);
-    
+
       //   //default blessing (currently set to 1)
       //   blessedCurses.forEach(curse => curse.blessing === null ? curse.blessing = 1 : null);
-    
+
       //   return res.status(200).json({
       //     user: { name, username, totalblessings, lastblessing, limiter },
       //     blessedCurses: blessedCurses
       //   });
       // });
-      
+
     });
   });
 });
-   
+
