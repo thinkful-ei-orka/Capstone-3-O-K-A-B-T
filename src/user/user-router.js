@@ -8,6 +8,7 @@ const jsonBodyParser = express.json();
 
 userRouter
   .route('/')
+  //add new user to db
   .post(jsonBodyParser, async (req, res, next) => {
     const { password, username, name } = req.body;
 
@@ -51,10 +52,11 @@ userRouter
       next(error);
     }
   })
+  //pull user data and blessed curses
   .get(requireAuth, jsonBodyParser, async (req, res, next) => {
     const { user_id, name, username, totalblessings, lastblessing, limiter } = req.user;
 
-    await UserService.oldCurseResponse(req.app.get('db'),req.user.user_id)
+    await UserService.oldCurseResponse(req.app.get('db'), req.user.user_id);
 
     const blessedCurses = await UserService.blessedCurses(req.app.get('db'), user_id);
 
@@ -65,6 +67,14 @@ userRouter
       user: { name, username, totalblessings, lastblessing, limiter },
       blessedCurses: blessedCurses
     });
+  })
+  //add user to specific user's blocklist
+  .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
+    if (!req.body.blocked_id) {
+      return res.status(400).json("no 'blocked_id' found in body");
+    }
+    UserService.updateBlocklist(req.app.get('db'), req.user.user_id, req.body.blocked_id);
+    res.status(202).json(`User ${req.body.blocked_id} added to the blocklist`);
   });
 
 module.exports = userRouter;

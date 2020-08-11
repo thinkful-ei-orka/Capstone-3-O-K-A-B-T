@@ -26,14 +26,15 @@ The Quotes table has 3 attributes:
 - **quote_text**: The actual quote.
 - **quote_source**: The source of the quote.
 
-The Users table has 7 attributes:
+The Users table has 8 attributes:
 - **user_id**: Assigns an identifier integer to a user.
 - **name**: An easily changable alias that does not affect login credentials.
 - **username**: The first half of login credentials.
 - **password**: The second half of login credentials.
-- **totalBlessings**: The number of times they have successfully Blessed a Curse.
-- **lastBlessing**: The timestamp of the last time they pulled a Curse.  This is used to time out inactive users.
+- **totalblessings**: The number of times they have successfully Blessed a Curse.
+- **lastblessing**: The timestamp of the last time they pulled a Curse.  This is used to time out inactive users.
 - **limiter** : This is an integer that starts at and caps at 3.  Each Bless done reduces this by 1 and the user is barred from Blessing if the limiter is 0.  The limiter resets to 3 each day.
+- **blocklist**: An array of the user_id's of any user the current user does not with see any curses from
 
 
 Curse App has 5 API endpoints:
@@ -65,11 +66,16 @@ It matches the user to the curse they are blessing.
 It assigns a default emoji blessing to the curse if they did not make a decision before timing out.
 It then returns the blessing and deletes the curse from the blesser.
 
+A PATCH request to the User Router requires you to have authorization by being logged in. In addition, the body
+requires a 'blocked_id' property.
+It adds the blocked_id to the user's blocklist.
+
 A POST request to the Auth Router require username and password.  If these corespond to an existing 
 account, an Auth Token is sent.
 
 A GET request to the Curses Router requires user_id and returns a random curse that 
-is not coresponding to the current user's user_id.
+-is not coresponding to the current user's user_id
+-does not belong to a blocked user's user_id
 
 A POST request to the Curses Router handles both anonymous and logged in curses.
 It only requires Curse, but can also accept user_id for logged in users.

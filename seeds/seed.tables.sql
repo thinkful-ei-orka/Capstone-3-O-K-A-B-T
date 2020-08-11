@@ -3,10 +3,10 @@ BEGIN;
         users,
         curses,
         blessings,
-        quotes;
+        quotes
+        RESTART IDENTITY CASCADE;
 
-INSERT INTO users
-    (name, username, password, totalBlessings, lastBlessing, limiter, blocklist)
+INSERT INTO users (name, username, password, totalBlessings, lastBlessing, limiter, blocklist)
 VALUES
     ('admin',
         'admin',
@@ -34,8 +34,7 @@ VALUES
         Array[1]
         );
 
-INSERT INTO blessings
-    (blessing)
+INSERT INTO blessings (blessing)
 VALUES
     ('U+1F91F');
 
@@ -46,8 +45,7 @@ VALUES
     ('Crazy people be crazy', 2, false, null, 1, TO_TIMESTAMP('2020-08-05 15:54:47.98000','YYYY-MM-DD HH24:MI:SS.US')),
     ('This is the last one', 1, true, 1, 2, TO_TIMESTAMP('2020-08-05 15:54:47.98000','YYYY-MM-DD HH24:MI:SS.US'));
 -- '2020-08-05T15:54:47.980Z'
-INSERT INTO quotes
-    (quote_text,quote_source)
+INSERT INTO quotes (quote_text,quote_source)
 VALUES
     ('Swearing is industry language. For as long as we''re alive it''s not going to change. You''ve got to be boisterous to get results', 'Gordon Ramsay'),
     ('Swearing''s my release. It''s the one weapon I have to defend myself against destiny when it elects to strike without pity', 'Andrea Pirlo'),

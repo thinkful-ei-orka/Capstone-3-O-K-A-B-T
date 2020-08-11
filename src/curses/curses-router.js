@@ -15,7 +15,7 @@ cursesRouter
         req.app.get('db'),
         req.user.user_id
       );
-
+        console.log(curse_id)
       if (!curse_id[0]) {
         return res.status('200').json('No available curses');
       } else {

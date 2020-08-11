@@ -53,11 +53,30 @@ const UserService = {
     return db
       .from('curses')
       .update({
-        blessed:true,
-        blessing:1,
+        blessed: true,
+        blessing: 1,
       })
-      .whereRaw("user_id = ? and ((pulled_by ISNULL and pulled_time < now() - interval '2 days') or (pulled_by NOTNULL and pulled_time < now() - interval '1 hour'))",[user_id]);
+      .whereRaw("user_id = ? and ((pulled_by ISNULL and pulled_time < now() - interval '2 days') or (pulled_by NOTNULL and pulled_time < now() - interval '1 hour'))", [user_id]);
+  },
+
+  getBlocklist(db, user_id) {
+    return db
+      .select('blocklist')
+      .from('users')
+      .where('user_id', user_id)
+      .first();
+  },
+
+  async updateBlocklist(db, user_id, blocked_id) {
+    let oldBlocklist = await this.getBlocklist(db, user_id);
+    let updatedBlocklist = [...oldBlocklist.blocklist, blocked_id].sort();
+    updatedBlocklist = Array.from(new Set(updatedBlocklist));
+    return db
+      .from('users')
+      .update({ 'blocklist': updatedBlocklist })
+      .where('user_id', user_id);
   }
+
 };
 
 module.exports = UserService;
