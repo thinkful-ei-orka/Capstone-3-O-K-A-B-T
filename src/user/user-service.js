@@ -69,7 +69,8 @@ const UserService = {
 
   async updateBlocklist(db, user_id, blocked_id) {
     let oldBlocklist = await this.getBlocklist(db, user_id);
-    let updatedBlocklist = [...oldBlocklist.blocklist, blocked_id].sort();
+    oldBlocklist.blocklist === null ? oldBlocklist = [] : oldBlocklist = oldBlocklist.blocklist;
+    let updatedBlocklist = [...oldBlocklist, blocked_id].sort();
     updatedBlocklist = Array.from(new Set(updatedBlocklist));
     return db
       .from('users')

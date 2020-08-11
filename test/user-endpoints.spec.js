@@ -146,7 +146,7 @@ describe('User Endpoints', function () {
           username: 'test username',
           password: '11AAaa!!',
           name: 'test name',
-          
+
         };
         return supertest(app)
           .post('/api/user')
@@ -155,7 +155,7 @@ describe('User Endpoints', function () {
             return db
               .from('users')
               .select('*')
-              .where( 'username', res.body.username )
+              .where('username', res.body.username)
               .first()
               .then(row => {
                 expect(row.username).to.eql(newUser.username);
@@ -165,23 +165,24 @@ describe('User Endpoints', function () {
               })
               .then(compareMatch => {
                 expect(compareMatch).to.be.true;
-              })}
+              });
+          }
           );
       });
-    })
+    });
   });
 
   describe(`GET /api/user`, () => {
     beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
     it(`returns 200 and name, username, totalblessings, lastblessing, limiter, and blessedCurses`, async () => {
 
-      const user = await helpers.getUserById(db, 1)
+      const user = await helpers.getUserById(db, 1);
 
-      const blessing = await helpers.getBlessedCurses(db, 1)
+      const blessing = await helpers.getBlessedCurses(db, 1);
 
       //get call to test user db to grab info and await 
-      
-      
+
+
       return supertest(app)
         .get('/api/user')
         .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
@@ -190,13 +191,50 @@ describe('User Endpoints', function () {
           expect(res.body.user.username).to.eql(user.username);
           expect(res.body.user.name).to.eql(user.name);
           expect(res.body.user.totalblessings).to.eql(user.totalblessings);
-          expect(res.body.user.lastblessing).to.eql(user.lastblessing.toISOString())
-          expect(res.body.user.limiter).to.eql(user.limiter)
-          expect(res.body.blessedCurses).to.eql(blessing)
-        })
+          expect(res.body.user.lastblessing).to.eql(user.lastblessing.toISOString());
+          expect(res.body.user.limiter).to.eql(user.limiter);
+          expect(res.body.blessedCurses).to.eql(blessing);
+        });
 
     });
   });
 
-})
+  describe(`PATCH /api/user`, () => {
+    context('user is not logged in', () => {
+      it('returns 403: not authorized', () => {
+        return supertest(app)
+          .patch('/api/user')
+          .expect(401);
+      });
+    });
+    context('user is logged in', () => {
+      context('req.body does not contain a blocked_id', () => {
+        beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
+        it(`returns 400: "no 'blocked_id' found in body"`, () => {
+          return supertest(app)
+            .patch('/api/user')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .expect(400)
+            .expect(`"no 'blocked_id' found in body"`);
+        });
+      });
+      context('valid input', () => {
+        beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
+        it('returns 202: User {blocked_id} added to the blocklist', () => {
+          const blocked_id = 3;
+          return supertest(app)
+            .patch('/api/user')
+            .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
+            .send({ blocked_id: blocked_id })
+            .expect(202)
+            .expect(`"User ${blocked_id} added to the blocklist"`)
+            .then(async () => {
+              const updatedUser = await helpers.getUserById(db, 1);
+              expect(updatedUser.blocklist).to.eql([3]);
+            });
+        });
+      });
+    });
+  });
+});
 

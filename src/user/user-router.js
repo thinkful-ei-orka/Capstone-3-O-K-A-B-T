@@ -73,7 +73,7 @@ userRouter
     if (!req.body.blocked_id) {
       return res.status(400).json("no 'blocked_id' found in body");
     }
-    UserService.updateBlocklist(req.app.get('db'), req.user.user_id, req.body.blocked_id);
+    await UserService.updateBlocklist(req.app.get('db'), req.user.user_id, req.body.blocked_id);
     res.status(202).json(`User ${req.body.blocked_id} added to the blocklist`);
   });
 
