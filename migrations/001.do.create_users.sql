@@ -3,7 +3,8 @@ CREATE TABLE users (
   name TEXT NOT NULL,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  totalBlessings INTEGER DEFAULT 0,
-  lastBlessing TIMESTAMPTZ NOT NULL DEFAULT now(),
-  limiter INTEGER DEFAULT 3
+  totalblessings INTEGER DEFAULT 0,
+  lastblessing TIMESTAMPTZ NOT NULL DEFAULT now(),
+  limiter INTEGER DEFAULT 3,
+  blocklist INTEGER ARRAY DEFAULT NULL
 );

@@ -8,18 +8,18 @@ const jsonBodyParser = express.json();
 
 cursesRouter
   .route('/')
+  //Grabbing a random curse and updating the database
   .get(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
       let curse_id = await CursesService.getAllCurses(
         req.app.get('db'),
         req.user.user_id
       );
+
       if (!curse_id[0]) {
         return res.status('200').json('No available curses');
       } else {
         const index = Math.floor(Math.random() * curse_id.length);
-
-
 
         const curse = { curse_id: curse_id[index].curse_id, curse: curse_id[index].curse };
         await CursesService.updateCursePulled(req.app.get('db'), curse.curse_id, req.user.user_id);
@@ -30,6 +30,7 @@ cursesRouter
     }
 
   })
+  //Add a new curse to the database
   .post(userFromAuth, jsonBodyParser, async (req, res, next) => {
     try {
       if (req.body.curse === "") {
@@ -68,7 +69,7 @@ cursesRouter
       next(error);
     }
   })
-
+  //Bless an existing curse and update db
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
       if (!req.body.blessing_id) {
@@ -97,7 +98,7 @@ cursesRouter
       next(error);
     }
   })
-
+  //Remove curse and respond with removed curse
   .delete(jsonBodyParser, requireAuth, async (req, res, next) => {
     try {
       if (!req.body.curse_id) { return res.status(400).json('body does not contain curse_id for deletion'); }

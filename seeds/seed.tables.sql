@@ -6,22 +6,32 @@ BEGIN;
         quotes;
 
 INSERT INTO users
-    (name, username, password, totalBlessings, lastBlessing, limiter)
+    (name, username, password, totalBlessings, lastBlessing, limiter, blocklist)
 VALUES
     ('admin',
         'admin',
         -- password = "pass"
-        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG', 
+        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
         10,
         now(),
-        3
+        3,
+        NULL
         ),
     ('receiver',
         'receiver',
         '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
         10,
         now(),
-        3
+        3,
+        NULL
+        ),
+    ('ignores-1',
+        'ignores-1',
+        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
+        10,
+        now(),
+        3,
+        Array[1]
         );
 
 INSERT INTO blessings

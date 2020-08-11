@@ -37,11 +37,21 @@ const CursesService = {
       .where('user_id', user_id);
   },
 
-  getAllCurses(db, user_id) {
+  getBlockList(db,user_id){
+    return db
+    .select('blocklist')
+    .from('users')
+    .where('user_id',user_id)
+    .first()
+  },
+
+  async getAllCurses(db, user_id) {
+    const blocklist = await this.getBlockList(db,user_id)
     return db
       .from('curses')
       .select('*')
       .whereNot("user_id", user_id)
+      .whereNotIn('user_id',blocklist.blocklist)
       .where("pulled_by", null);
   },
 
