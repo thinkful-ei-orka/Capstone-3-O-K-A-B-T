@@ -14,7 +14,8 @@ function makeUsersArray() {
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 10,
       lastblessing: new Date(),
-      limiter: 3
+      limiter: 3,
+      blocklist: null
     },
     {
       user_id: 2,
@@ -24,7 +25,8 @@ function makeUsersArray() {
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 5,
       lastblessing: new Date(),
-      limiter: 0
+      limiter: 0,
+      blocklist: null
     },
     {
       user_id: 3,
@@ -34,7 +36,8 @@ function makeUsersArray() {
       password: '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
       totalblessings: 3,
       lastblessing: new Date(Date.now() - ((24 * 60 * 60 * 1000) + 1)),
-      limiter: 0
+      limiter: 0,
+      blocklist: [1]
     }
   ];
 }
@@ -266,6 +269,32 @@ function getAllCurses(db) {
   return db.select().from('curses');
 }
 
+function getBlockList(db, user_id) {
+  return db
+    .select('blocklist')
+    .from('users')
+    .where('user_id', user_id)
+    .first();
+}
+
+async function getAllAvailableCurses(db, user_id) {
+  let blocklist = await this.getBlockList(db, user_id);
+  blocklist = blocklist.blocklist;
+  return blocklist === null ?
+    db
+      .from('curses')
+      .select('*')
+      .whereNot("user_id", user_id)
+      .where("pulled_by", null)
+    :
+    db
+      .from('curses')
+      .select('*')
+      .whereNot("user_id", user_id)
+      .whereNotIn('user_id', blocklist)
+      .where("pulled_by", null);
+}
+
 function getUserById(db, user_id) {
   return db.select().from('users').where('user_id', user_id).first();
 }
@@ -310,6 +339,8 @@ module.exports = {
   getCurseById,
   getAllCurses,
   getUserById,
+  getBlockList,
+  getAllAvailableCurses,
 
   cleanTables,
   seedUsers,

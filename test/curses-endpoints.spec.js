@@ -43,7 +43,7 @@ describe('Curses Endpoints', function () {
       });
     });
 
-    context('curses available for blessing', () => {
+    context('curses available for blessing and logged in', () => {
       let pulledCurse;
       let editedCurse;
       beforeEach('seed blessings/users/curses', async () => {
@@ -69,6 +69,17 @@ describe('Curses Endpoints', function () {
       it('updates the curse in the database with the user_id and time of pull', () => {
         expect(editedCurse.pulled_by).to.eql(testUsers[1].user_id);
         expect(Date.now() - new Date(editedCurse.pulled_time) < 10000);
+      });
+
+      it(`doesn't allow curses from the user's blocklist`, () => {
+        return supertest(app)
+          .get('/api/curses')
+          .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[2])}`)
+          .expect(200)
+          .then(async () => {
+            const availableForUser3 = await helpers.getAllAvailableCurses(db, 3);
+            expect(availableForUser3).to.eql([]);
+          });
       });
     });
   });

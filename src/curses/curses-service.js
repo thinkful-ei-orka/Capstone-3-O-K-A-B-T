@@ -48,7 +48,6 @@ const CursesService = {
   async getAllCurses(db, user_id) {
     let blocklist = await this.getBlockList(db, user_id);
     blocklist = blocklist.blocklist;
-    console.log(blocklist);
     return blocklist === null ?
       db
         .from('curses')
