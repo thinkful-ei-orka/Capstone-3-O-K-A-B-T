@@ -68,7 +68,7 @@ It then returns the blessing and deletes the curse from the blesser.
 
 A PATCH request to the User Router requires you to have authorization by being logged in. In addition, the body
 requires a 'blocked_id' property.
-It adds the blocked_id to the user's blocklist.
+It adds the blocked_id to the logged in user's blocklist.
 
 A POST request to the Auth Router require username and password.  If these corespond to an existing 
 account, an Auth Token is sent.
