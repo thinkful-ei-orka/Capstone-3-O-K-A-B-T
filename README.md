@@ -1,8 +1,6 @@
 # Curse App API
-===
+##### https://warm-garden-23848.herokuapp.com/
 
-`${Live Link}`
----
 
 <!-- The Curse App API uses 4 tables:
 Blessings, Curses, Quotes, and Users
@@ -37,49 +35,120 @@ The Users table has 8 attributes:
 - **blocklist**: An array of the user_id's of any user the current user does not with see any curses from -->
 
 
-BlessCurse has 5 API endpoints:
+## BlessCurse has 5 API endpoints:
 - /api/auth/token
 - /api/user
 - /api/blessings
 - /api/curses
 - /api/quotes
 
+### Authorization - '/api/auth/token'
+---
+#### POST
+  - Parameters
+    - username
+    - password
+  - Returns
+    - If the username and password both match an existing user, an auth token is provided
+---
+---
+### User - '/api/user'
+---
+#### POST
+  - Parameters
+    - name
+    - username 
+      - Must be unique
+    - password
+      - Must be more than 7 characters
+      - Must be less than 72 characters
+      - Must not start or end with a space
+      - Must have an upper case letter
+      - Must have a lower case letter
+      - Must have a number
+      - Must have a special character
+  - Returns
+    - Creates a new account on the database and returns the created user
 
-A GET request to the Bless Router takes no parameters 
-and returns all blessings and blessing_ids
+#### GET - Authorization required
+  - Parameters
+    - none
+  - Returns
+    - The current user's data
+    - All blessed curses that belong to that user
 
-Request to the User Router and Auth Router use standard login/registration functionality:
-
-A POST reqest to the User Router requires Username, Password, and Name.
-- It creates a new account.
-- It validates the password in various ways, requiring more than 7 characters, less than 72 characters, does not start or end with a space, and has at least one upper case, lower case, numeric, and special character.
-It then returns the id, name, and username.
-
-A GET request to the User Router requires you to have authorization by 
-being logged in.  This uses user_id, name, username, totalblessings, lastblessing, and limiter, all 
-of which are part of the req.user.  
-It matches the user to the curse they are blessing.
-It assigns a default emoji blessing to the curse if they did not make a decision before timing out.
-It then returns the blessing and deletes the curse from the blesser.
-
-A PATCH request to the User Router requires you to have authorization by being logged in. In addition, the body
-requires a 'blocked_id' property.
-It adds the blocked_id to the logged in user's blocklist.
-
-A POST request to the Auth Router require username and password.  If these corespond to an existing 
-account, an Auth Token is sent.
-
-A GET request to the Curses Router requires user_id and returns a random curse that 
--is not coresponding to the current user's user_id
--does not belong to a blocked user's user_id
-
-A POST request to the Curses Router handles both anonymous and logged in curses.
-It only requires Curse, but can also accept user_id for logged in users.
-It adds the curse to the Curse table and returns the curse and will also return the 
-username if it recieved a user_id.
-
-A PATCH request to the Curses Router flags a curse as Blessed, lowers the user's limiter attribute by 1, and resets a user's limiter back to 3 after 24 hours (subject to change...).
-It requires user_id and blessing_id.
-
-A GET request to the Quote Router returns a random quote and coresponding source.
-
+#### PATCH - Authorization required
+  - Parameters
+    - curse_id - the curse_id belonging to the user you wish to block
+  - Returns
+    - Adds the owner of the curse to be added to the current user's blocklist. No curses from that user will be displayed to the current user thereafter
+---
+---
+### Blessings - '/api/blessings' 
+---
+#### GET
+  - Parameters
+    - None
+  - Returns
+    - All blessings and blessing_ids in an array
+---
+---
+### Curses - '/api/curses'
+---
+#### GET - Requires authorization
+  - Parameters
+    - None
+  - Returns
+    - If available curses exist for the user
+      - A random curse from the pool of available curses is provided to the user
+      - Available curses are curses that
+        - Do not belong to the current user
+        - Do not belong to any of the users on the current user's blocklist
+        - Have not being previously pulled or blessed by any user
+    - If no curses exist for the user
+      - 'No available curses'
+#### POST
+  - Parameters
+    - curse
+      - A curse message cannot
+        - Be empty
+        - Be less than 10 characters
+        - Be less than 4 words
+        - Be more than 400 characters
+  - Returns
+    - Adds the curse to the database
+    - Send a message and submitted information to the user as an object
+      - If logged in
+        - user: username
+        - curse: curse sent to the database
+        - message: 'Curse sent as (username)'
+      - If not logged in
+        - user: null
+        - curse: curse sent to the database
+        - message: 'Curse sent anonymously'
+#### PATCH - Requires authorization
+  - Parameters
+    - blessing_id - the blessing to apply to the curse
+    - curse_id - the curse to be blessed
+  - Returns
+    - Blesses the curse within the database and assigns the desired blessing to it
+    - Message: 'Curse blessed with blessing (blessing_id)'
+#### DELETE - Requires authorization
+  - Parameters
+    - curse_id - the curse_id of the curse to be blessed
+  - Returns
+    - The authorized user must be the owner of the curse being deleted
+    - If owner, returns an object
+      - {deletedCurse: (all curse data)}
+    - If not owner
+      - 'User is not the owner of the provided curse'
+---
+---
+### Quotes - '/api/quotes'
+---
+#### GET - Requires authorization
+  - Parameters
+    - None
+  - Returns
+    - A random quote from the database table
+    - The quote will include the quote and the source as an object: {quote, source}
