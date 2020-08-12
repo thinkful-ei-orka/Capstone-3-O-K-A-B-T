@@ -59,7 +59,7 @@ cursesRouter
         await CursesService.postCurse(req.app.get('db'), req.body.curse);
 
         return res.status(201).json({
-          message: 'Curse sent annonymously',
+          message: 'Curse sent anonymously',
           curse: req.body.curse,
           user: null
         });

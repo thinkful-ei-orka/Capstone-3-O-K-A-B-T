@@ -1,10 +1,10 @@
-Curse App API
+# Curse App API
 ===
 
 `${Live Link}`
 ---
 
-The Curse App API uses 4 tables:
+<!-- The Curse App API uses 4 tables:
 Blessings, Curses, Quotes, and Users
 
 The Blessings Table has 2 attributes:
@@ -34,10 +34,10 @@ The Users table has 8 attributes:
 - **totalblessings**: The number of times they have successfully Blessed a Curse.
 - **lastblessing**: The timestamp of the last time they pulled a Curse.  This is used to time out inactive users.
 - **limiter** : This is an integer that starts at and caps at 3.  Each Bless done reduces this by 1 and the user is barred from Blessing if the limiter is 0.  The limiter resets to 3 each day.
-- **blocklist**: An array of the user_id's of any user the current user does not with see any curses from
+- **blocklist**: An array of the user_id's of any user the current user does not with see any curses from -->
 
 
-Curse App has 5 API endpoints:
+BlessCurse has 5 API endpoints:
 - /api/auth/token
 - /api/user
 - /api/blessings
@@ -48,15 +48,11 @@ Curse App has 5 API endpoints:
 A GET request to the Bless Router takes no parameters 
 and returns all blessings and blessing_ids
 
-Request to the User Router and Auth Router are extremely standard 
-for login/registration functionality, but for those 
-not familiar:
+Request to the User Router and Auth Router use standard login/registration functionality:
 
-A POST reqest to the User Router requires 
-Username, Password, and Name.
-It is used to make an account.
-It validates the password in various ways, demanding it is more than 7 characters, less than 72 characters, 
-does not start or end with a space, and has at least one upper case, lower case, numeric, and special character.
+A POST reqest to the User Router requires Username, Password, and Name.
+- It creates a new account.
+- It validates the password in various ways, requiring more than 7 characters, less than 72 characters, does not start or end with a space, and has at least one upper case, lower case, numeric, and special character.
 It then returns the id, name, and username.
 
 A GET request to the User Router requires you to have authorization by 
