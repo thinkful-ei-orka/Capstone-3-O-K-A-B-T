@@ -59,6 +59,14 @@ const UserService = {
       .whereRaw("user_id = ? and ((pulled_by ISNULL and pulled_time < now() - interval '2 days') or (pulled_by NOTNULL and pulled_time < now() - interval '1 hour'))", [user_id]);
   },
 
+  getUserFromCurseId(db, curse_id) {
+    return db
+      .select('user_id')
+      .from('curses')
+      .where('curse_id', curse_id)
+      .first();
+  },
+
   getBlocklist(db, user_id) {
     return db
       .select('blocklist')

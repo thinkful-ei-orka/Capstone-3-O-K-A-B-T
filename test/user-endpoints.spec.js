@@ -10,7 +10,7 @@ const { getBlessedCurses } = require('./test-helpers');
 describe('User Endpoints', function () {
   let db;
 
-  const testUsers = helpers.makeUsersArray();
+  const { testUsers, testBlessings } = helpers.makeFixtures();
   const testUser = testUsers[0];
 
   before('make knex instance', () => {
@@ -208,26 +208,41 @@ describe('User Endpoints', function () {
       });
     });
     context('user is logged in', () => {
-      context('req.body does not contain a blocked_id', () => {
+      context('req.body does not contain a curse_id', () => {
         beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
-        it(`returns 400: "no 'blocked_id' found in body"`, () => {
+        it(`returns 400: "no 'curse_id' found in body"`, () => {
           return supertest(app)
             .patch('/api/user')
             .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
             .expect(400)
-            .expect(`"no 'blocked_id' found in body"`);
+            .expect(`"no 'curse_id' found in body"`);
         });
       });
       context('valid input', () => {
-        beforeEach('insert users', async () => await helpers.seedUsers(db, testUsers));
-        it('returns 202: User {blocked_id} added to the blocklist', () => {
-          const blocked_id = 3;
+        const testCurse = {
+          curse_id: 3,
+          curse: 'pulled not blessed, not timed out',
+          user_id: 3,
+          blessed: false,
+          blessing: null,
+          pulled_by: 2,
+          pulled_time: new Date(Date.now() - (1000 * 60)).toISOString()
+        };
+
+        beforeEach('insert users', async () => {
+          await helpers.seedUsers(db, testUsers);
+          await helpers.seedBlessings(db, testBlessings);
+          await helpers.seedCurses(db, [testCurse]);
+        });
+
+        it('returns 202: User {curse_id} added to the blocklist', () => {
+          const curse_id = 3;
           return supertest(app)
             .patch('/api/user')
             .set('Authorization', `Bearer ${helpers.makeAuthHeader(testUsers[0])}`)
-            .send({ blocked_id: blocked_id })
+            .send({ curse_id: curse_id })
             .expect(202)
-            .expect(`"User ${blocked_id} added to the blocklist"`)
+            .expect(`"User 3 added to the blocklist"`)
             .then(async () => {
               const updatedUser = await helpers.getUserById(db, 1);
               expect(updatedUser.blocklist).to.eql([3]);

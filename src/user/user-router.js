@@ -70,11 +70,12 @@ userRouter
   })
   //add user to specific user's blocklist
   .patch(requireAuth, jsonBodyParser, async (req, res, next) => {
-    if (!req.body.blocked_id) {
-      return res.status(400).json("no 'blocked_id' found in body");
+    if (!req.body.curse_id) {
+      return res.status(400).json("no 'curse_id' found in body");
     }
-    await UserService.updateBlocklist(req.app.get('db'), req.user.user_id, req.body.blocked_id);
-    res.status(202).json(`User ${req.body.blocked_id} added to the blocklist`);
+    const blocked_id = await UserService.getUserFromCurseId(req.app.get('db'), req.body.curse_id);
+    await UserService.updateBlocklist(req.app.get('db'), req.user.user_id, blocked_id.user_id);
+    res.status(202).json(`User ${blocked_id.user_id} added to the blocklist`);
   });
 
 module.exports = userRouter;
