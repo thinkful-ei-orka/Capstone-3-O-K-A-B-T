@@ -40,7 +40,7 @@ authRouter
           region: 'compare fail',
           loginUser,
           dbUser,
-          hashedPassword: bcrypt.hash(dbUser.password, 12),
+          hashedPassword: bcrypt.hash(loginUser.password, 12),
           error: 'Incorrect username or password',
         });
 
