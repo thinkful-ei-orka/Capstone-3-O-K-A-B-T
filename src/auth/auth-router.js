@@ -24,6 +24,8 @@ authRouter
       );
       if (!dbUser) {
         return res.status(400).json({
+          region:'dbUser fail',
+          loginUser,
           error: 'Incorrect username or password',
         });
       }
@@ -35,6 +37,8 @@ authRouter
 
       if (!compareMatch)
         return res.status(400).json({
+          region:'compare fail',
+          loginUser,
           error: 'Incorrect username or password',
         });
 
