@@ -39,6 +39,7 @@ authRouter
         return res.status(400).json({
           region:'compare fail',
           loginUser,
+          dbUser,
           error: 'Incorrect username or password',
         });
 
