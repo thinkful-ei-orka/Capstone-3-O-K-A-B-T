@@ -35,11 +35,7 @@ authRouter
       const hashedPassword = await bcrypt.hash(loginUser.password,12)
       if (!compareMatch)
         return res.status(400).json({
-          region: 'compare fail',
-          loginUser,
-          dbUser,
-          hashedPassword,
-          error: 'Incorrect username or password',
+          error: 'Incorrect password or username',
         });
 
       const sub = dbUser.username;
