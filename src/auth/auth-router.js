@@ -1,6 +1,6 @@
 const express = require('express');
 const AuthService = require('./auth-service');
-const { requireAuth } = require('../middleware/jwt-auth');
+const bcrypt = require('bcryptjs');
 
 const authRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -24,7 +24,7 @@ authRouter
       );
       if (!dbUser) {
         return res.status(400).json({
-          region:'dbUser fail',
+          region: 'dbUser fail',
           loginUser,
           error: 'Incorrect username or password',
         });
@@ -37,9 +37,10 @@ authRouter
 
       if (!compareMatch)
         return res.status(400).json({
-          region:'compare fail',
+          region: 'compare fail',
           loginUser,
           dbUser,
+          hashedPassword: bcrypt.hash(dbUser.password, 12),
           error: 'Incorrect username or password',
         });
 
