@@ -24,8 +24,6 @@ authRouter
       );
       if (!dbUser) {
         return res.status(400).json({
-          region: 'dbUser fail',
-          loginUser,
           error: 'Incorrect username or password',
         });
       }
@@ -34,13 +32,13 @@ authRouter
         loginUser.password,
         dbUser.password
       );
-
+      const hashedPassword = await bcrypt.hash(loginUser.password,12)
       if (!compareMatch)
         return res.status(400).json({
           region: 'compare fail',
           loginUser,
           dbUser,
-          hashedPassword: bcrypt.hash(loginUser.password, 12),
+          hashedPassword,
           error: 'Incorrect username or password',
         });
 
