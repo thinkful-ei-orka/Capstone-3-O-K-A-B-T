@@ -2,6 +2,7 @@ const express = require('express');
 const CursesService = require('./curses-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 const { userFromAuth } = require('../middleware/user_from_auth');
+const xss = require('xss');
 
 const cursesRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -52,7 +53,7 @@ cursesRouter
 
         return res.status(201).json({
           message: `Curse sent as '${req.user.username}'`,
-          curse: req.body.curse,
+          curse: xss(req.body.curse),
           user: req.user.username
         });
       } else {
@@ -60,7 +61,7 @@ cursesRouter
 
         return res.status(201).json({
           message: 'Curse sent anonymously',
-          curse: req.body.curse,
+          curse: xss(req.body.curse),
           user: null
         });
       }
