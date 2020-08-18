@@ -99,6 +99,7 @@ const CursesService = {
     return db
       .from('curses')
       .whereRaw("user_id is null and blessed = true")
+      .orWhereRaw("user_id is null and not pulled_by is null and pulled_time < now() - interval '1 hour'")
       .del();
   }
 };
