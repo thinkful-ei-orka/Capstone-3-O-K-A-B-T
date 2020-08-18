@@ -54,13 +54,15 @@ const CursesService = {
         .select('*')
         .whereNot("user_id", user_id)
         .where("pulled_by", null)
+        .orWhereNull('user_id')
       :
       db
         .from('curses')
         .select('*')
         .whereNot("user_id", user_id)
         .whereNotIn('user_id', blocklist)
-        .where("pulled_by", null);
+        .where("pulled_by", null)
+        .orWhereNull('user_id');
   },
 
   getCurseById(db, curse_id) {
@@ -92,6 +94,12 @@ const CursesService = {
       .from('users')
       .where('user_id', user_id)
       .first();
+  },
+  deleteBlessedAnonymousCurses(db) {
+    return db
+      .from('curses')
+      .whereRaw("user_id is null and blessed = true")
+      .del();
   }
 };
 

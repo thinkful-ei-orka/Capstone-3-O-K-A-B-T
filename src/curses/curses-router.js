@@ -3,6 +3,7 @@ const CursesService = require('./curses-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 const { userFromAuth } = require('../middleware/user_from_auth');
 const xss = require('xss');
+const { deleteBlessedAnonymousCurses } = require('./curses-service');
 
 const cursesRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -12,6 +13,7 @@ cursesRouter
   //Grabbing a random curse and updating the database
   .get(requireAuth, jsonBodyParser, async (req, res, next) => {
     try {
+      await deleteBlessedAnonymousCurses(req.app.get('db'));
       let curse_id = await CursesService.getAllCurses(
         req.app.get('db'),
         req.user.user_id
