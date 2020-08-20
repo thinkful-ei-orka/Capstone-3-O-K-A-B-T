@@ -44,7 +44,7 @@ cursesRouter
       if (req.body.curse.length < 10) {
         return res.status(400).json('Must be longer than 10 characters');
       }
-      if (req.body.curse.split(' ').length < 4) {
+      if (req.body.curse.trim().split(' ').length <= 2) {
         return res.status(400).json('Must be longer than 3 words');
       }
       if (req.body.curse.length > 400) {
