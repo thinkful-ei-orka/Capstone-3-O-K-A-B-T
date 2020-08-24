@@ -1,6 +1,7 @@
 # Curse App API
 ##### https://warm-garden-23848.herokuapp.com/
 
+![cursr-picture](https://user-images.githubusercontent.com/62114382/91065697-6ce6c500-e5f6-11ea-8637-5e3ef06c9ee3.png)
 
 <!-- The Curse App API uses 4 tables:
 Blessings, Curses, Quotes, and Users
